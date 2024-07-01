@@ -4,50 +4,52 @@ import { User } from "../entity/User"
 
 export class UserController {
 
-    private userRepository = AppDataSource.getRepository(User)
-
-    async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
-    }
-
-    async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+    private static userRepository = AppDataSource.getRepository(User)
 
 
-        const user = await this.userRepository.findOne({
-            where: { id }
-        })
-
-        if (!user) {
-            return "unregistered user"
+    static async getAllUsers(request: Request, response: Response, next: NextFunction) {
+        try {
+            const users = await UserController.userRepository.find();
+            return response.json(users);
+        } catch (error) {
+            return response.status(500).json({ error: "Failed to fetch users." });
         }
-        return user
     }
 
-    async save(request: Request, response: Response, next: NextFunction) {
-        const { firstName, lastName, age } = request.body;
+    static async getUserById(request: Request, response: Response, next: NextFunction) {
+        const id = parseInt(request.params.id);
+        try {
+            const user = await UserController.userRepository.findOne({
+                where: { id }
+            })
+            if (!user) {
+                return response.status(404).json("Unregistered user");
+            }
+            return response.json(user);
+        } catch (error) {
+            return response.status(500).json({ error: "Failed to fetch user." });
+        }
+    }
+
+    static async registerUser(request: Request, response: Response, next: NextFunction) {
+        const { firstName, lastName, age, email, role } = request.body;
 
         const user = Object.assign(new User(), {
             firstName,
             lastName,
-            age
-        })
+            age,
+            email,
+            role
+        });
 
-        return this.userRepository.save(user)
-    }
-
-    async remove(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
-
-        let userToRemove = await this.userRepository.findOneBy({ id })
-
-        if (!userToRemove) {
-            return "this user not exist"
+        try {
+            const savedUser = await UserController.userRepository.save(user);
+            return response.json(savedUser);
+        } catch (error) {
+            return response.status(500).json({ error: "Failed to register user." });
         }
-
-        await this.userRepository.remove(userToRemove)
-
-        return "user has been removed"
     }
+
+
 
 }

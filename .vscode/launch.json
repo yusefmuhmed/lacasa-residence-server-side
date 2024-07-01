@@ -1,12 +1,15 @@
 {
     "version": "0.2.0",
-    "configurations": [{
-        "name": "Launch Program",
-        "program": "${workspaceFolder}/index.js",
-        "request": "launch",
-        "skipFiles": [
-            "<node_internals>/**"
-        ],
-        "type": "node"
-    }, ]
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug TypeScript",
+            "runtimeArgs": ["-r", "ts-node/register"],
+            "args": ["${workspaceFolder}/src/index.ts"],
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}",
+            "protocol": "inspector"
+        }
+    ]
 }
