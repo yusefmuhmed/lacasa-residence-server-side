@@ -12,7 +12,20 @@ export class User {
     @Column()
     lastName: string
 
-    @Column()
-    age: number
+    @Column(
+        {
+            unique: true
+        }
+    )
+    email: string
+
+    @Column(
+        {
+            type: "enum",
+            enum: ["admin", "user"],
+            default: "user"
+        }
+    )
+    role: string
 
 }
